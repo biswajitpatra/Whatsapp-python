@@ -5,6 +5,15 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By 
 import time
 from tkinter import *
+from selenium.webdriver.chrome.options import Options
+import os
+
+selc=["Friend prashant"]
+
+def refresh(mas,l):
+    msg_psearch=webdriver.find_elements_by_xpath('//div[@class="_25Ooe"]//span[@class="_3TEwt"]//span[@dir="auto"]')
+    
+    mas.after(refresh,1000)
 
 def Wfunc(target,string):
     target=target.get()
@@ -12,7 +21,7 @@ def Wfunc(target,string):
     print("send to:",target,"\nMsg is:",string)
     group_search=wait.until(EC.presence_of_element_located((By.XPATH,'//*[@id="side"]/div[1]/div/label/input')))        
     group_search.send_keys(target)      
-    x_arg = '//span[contains(@title,"' + target + '")]'
+    x_arg = '//span[@title="' + target + '"]'
     print(x_arg)
     group_title = wait.until(EC.presence_of_element_located(( 
         By.XPATH, x_arg)))
@@ -25,8 +34,9 @@ def Wfunc(target,string):
     time.sleep(1)
     input_box.clear()
     
-
-driver = webdriver.Chrome()  
+options=webdriver.ChromeOptions()
+options.add_argument("user-data-dir="+os.getcwd())
+driver = webdriver.Chrome(chrome_options=options)  
 driver.get("https://web.whatsapp.com/")
 wait = WebDriverWait(driver, 600)
 print("started initiation.........")
@@ -39,13 +49,15 @@ t1.pack()
 Label(master,text="Enter the message").pack()
 t2=Text(master)
 t2.pack()
-w=Button(master,text='SEND',command=lambda: Wfunc(t1,t2))
-w.pack()
-
+Button(master,text='SEND',command=lambda: Wfunc(t1,t2)).pack()
+Button(master,text="EXIT",command=master.destroy).pack()
+l1=Label(master,text="NOT UPDATED")
+l1.pack()
+refresh(master,l1)
 
 
 master.mainloop()
 
 
 
-driver.quit()
+driver.close()
