@@ -1,15 +1,15 @@
-from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
-from selenium.common.exceptions import NoSuchElementException
-import time
-from tkinter import *
-from selenium.webdriver.chrome.options import Options
 import os
 import string
+import time
+from tkinter import *
 
+from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 selc = ["Friend prashant", "Friend Shriya Electrical Cet"]
 printable = set(string.printable)
@@ -26,8 +26,9 @@ def refresh():
       #print("title of chat..",table_preuser.get_attribute("class"))
       if table_preuser.get_attribute("class") == "_3_7SH _3DFk6 message-in tail":
        puser=driver.find_element_by_xpath('//*[@id="main"]/header/div[2]/div[1]/div/span').get_attribute("title")
-       text_fu=table_preuser.find_elements('.//span[@dir="ltr"]')
+       text_fu=table_preuser.find_elements(By.XPATH,'.//span[@dir="ltr"]')
        if len(text_fu)!=0:
+          text_fu=text_fu[0].text
           text_fu = "".join(filter(lambda x: x in printable, text_fu))
           l1["text"] = puser+":"+text_fu
           Wfunc(puser, "ECHO :"+result(text_fu), 2)
