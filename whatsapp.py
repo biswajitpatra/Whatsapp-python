@@ -11,7 +11,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-selc = ["Friend prashant", "Friend Shriya Electrical Cet"]
+selc = []
 printable = set(string.printable)
 
 
@@ -24,14 +24,14 @@ def refresh():
     if len(table_preuser)!=0:
       table_preuser=table_preuser[0] 
       #print("title of chat..",table_preuser.get_attribute("class"))
-      if table_preuser.get_attribute("class") == "_3_7SH _3DFk6 message-in tail":
+      if table_preuser.get_attribute("class") == "_3_7SH _3DFk6 message-in tail" or table_preuser.get_attribute("class") == "_3_7SH _3DFk6 message-in":
        puser=driver.find_element_by_xpath('//*[@id="main"]/header/div[2]/div[1]/div/span').get_attribute("title")
        text_fu=table_preuser.find_elements(By.XPATH,'.//span[@dir="ltr"]')
        if len(text_fu)!=0:
           text_fu=text_fu[0].text
           text_fu = "".join(filter(lambda x: x in printable, text_fu))
           l1["text"] = puser+":"+text_fu
-          Wfunc(puser, "ECHO :"+result(text_fu), 2)
+          Wfunc(puser, "BIT : "+result(text_fu), 2)
        else:
           Wfunc(puser, "Emoji detected no reply", 2)   
 
@@ -46,8 +46,8 @@ def refresh():
                text_fu = "".join(filter(lambda x: x in printable, text_fu))
                l1["text"] = x.text+":"+text_fu
                print("DETECTED BLACKELNED"+l1["text"])
-               Wfunc(x.text, "ECHO :"+result(text_fu), 1)
-    master.after(1000, refresh)     
+               Wfunc(x.text, "BIT : "+result(text_fu), 1)
+    master.after(500, refresh)     
 
 
 def Wfunc(target, string, panel):
@@ -66,7 +66,7 @@ def Wfunc(target, string, panel):
                     x_arg = '//span[@title="' + target + '"]'
                     print(x_arg)
                     group_title = wait.until(
-                         EC.presence_of_element_located((By.XPATH, x_arg)))
+                         EC.element_to_be_clickable((By.XPATH, x_arg)))
                group_title.click()
                print("clicked.........")
                inp_xpath = '//div[@class="_2S1VP copyable-text selectable-text"][@dir="ltr"][@data-tab="1"]'
