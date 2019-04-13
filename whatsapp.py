@@ -2,7 +2,8 @@ import os
 import string
 import time
 from tkinter import *
-
+import sqlite3
+from spellchecker import SpellChecker
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.chrome.options import Options
@@ -14,9 +15,51 @@ from selenium.webdriver.support.ui import WebDriverWait
 selc = []
 printable = set(string.printable)
 
+spell=SpellChecker()
+#spell.word_frequency.load_text_file('./my_free_text_doc.txt')
 
-def result(gstring):
-    return gstring
+conn=sqlite3.connect("details.db")
+c=conn.cursor()
+c.execute("CREATE TABLE messaging (contact text,message text,io text)")
+
+def result(gstring,contact):
+     gstring=gstring.lower()
+     c.execute("SELECT * FROM messaging WHERE contact=?",(contact,))
+     rows=c.fetchall()
+     c.execute("INSERT INTO messaging VALUES (?,?,'i')",(contact,gstring,))
+     conn.commit()
+     if(len(rows)==0):
+        outsto("HI\n I am BIT.\n you can talk to me as BISWAJIT is somewhat busy at this moment",contact)
+        return "HI\n I am BIT.\n you can talk to me as BISWAJIT is somewhat busy at this moment"
+     
+    # if(gstring.lower())
+     gss=gstring.split()
+     lugss=spell.unknown(gss)
+     print(lugss)
+     if len(lugss)==0:
+          outsto("WORK IN PROGRESS",contact)
+          return "work in progress"
+     elif len(lugss)>2:
+               outsto("Can we talk in simple English\n as i am used to it",contact)
+               return "Can we talk in simple English\n as i am used to it" 
+     elif len(lugss)<=2 :              
+           for x in range(len(gss)):
+             if gss[x] in lugss:
+               gssx=spell.correction(gss[x])
+               if gssx==gss[x]:
+                    outsto("Can we talk in simple English\n as i am used to it",contact)
+                    return "Can we talk in simple English\n as i am used to it"
+               gss[x]=gssx          
+           gstring=" ".join(gss)
+           outsto("Did u mean \n"+gstring,contact)
+           return "Did u mean \n"+gstring
+
+
+def outsto(msg,contact):
+     msg.replace("\n","")
+     msg=msg.lower()
+     c.execute("INSERT INTO messaging VALUES (?,?,'o')",(contact,msg,))
+     conn.commit()
 
 
 def refresh():
@@ -31,7 +74,7 @@ def refresh():
           text_fu=text_fu[0].text
           text_fu = "".join(filter(lambda x: x in printable, text_fu))
           l1["text"] = puser+":"+text_fu
-          Wfunc(puser, "BIT : "+result(text_fu), 2)
+          Wfunc(puser, "BIT : "+result(text_fu,puser), 2)
        else:
           Wfunc(puser, "Emoji detected no reply", 2)   
 
@@ -46,7 +89,7 @@ def refresh():
                text_fu = "".join(filter(lambda x: x in printable, text_fu))
                l1["text"] = x.text+":"+text_fu
                print("DETECTED BLACKELNED"+l1["text"])
-               Wfunc(x.text, "BIT : "+result(text_fu), 1)
+               Wfunc(x.text, "BIT : "+result(text_fu,x.text), 1)
     master.after(500, refresh)     
 
 
@@ -109,6 +152,7 @@ refresh()
 
 
 master.mainloop()
-
-
 driver.close()
+conn.close()
+os.remove("details.db")
+print("SUCCESSFULL EXIT")
